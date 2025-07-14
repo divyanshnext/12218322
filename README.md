@@ -13,7 +13,7 @@ A full-stack URL shortening service built with **React** (frontend) and **Node.j
 - ✅ **Batch Processing**: Create up to 5 URLs at once
 
 ### Security & Production Features
-- 🔒 **Authentication**: Bearer token-based API authentication
+- 🔒 **Authentication**: Static Bearer token-based API authentication
 - 🛡️ **Rate Limiting**: 50 requests per minute per IP
 - 🔐 **Security Headers**: XSS protection, content type validation
 - 📝 **Input Validation**: URL format and shortcode validation
@@ -44,7 +44,7 @@ npm install
 
 Create `.env` file:
 ```env
-AUTH_TOKEN=your_jwt_token_here
+AUTH_TOKEN=your_auth_token_here
 NODE_ENV=development
 PORT=5000
 BASE_URL=http://localhost:5000
@@ -65,7 +65,7 @@ npm install
 
 Create `.env` file:
 ```env
-VITE_AUTH_TOKEN=your_jwt_token_here
+VITE_AUTH_TOKEN=your_auth_token_here
 ```
 
 Start the development server:
@@ -82,7 +82,7 @@ http://localhost:5000
 ```
 
 ### Authentication
-All API requests require Bearer token authentication:
+All API requests require static Bearer token authentication:
 ```
 Authorization: Bearer <your_token>
 ```
@@ -199,7 +199,7 @@ Redirects to the original URL and tracks the click.
 
 #### Backend (`.env`)
 ```env
-AUTH_TOKEN=your_jwt_token_here
+AUTH_TOKEN=your_auth_token_here
 NODE_ENV=development|production
 PORT=5000
 BASE_URL=http://localhost:5000
@@ -207,7 +207,7 @@ BASE_URL=http://localhost:5000
 
 #### Frontend (`.env`)
 ```env
-VITE_AUTH_TOKEN=your_jwt_token_here
+VITE_AUTH_TOKEN=your_auth_token_here
 ```
 
 ### Rate Limiting
@@ -296,27 +296,6 @@ npm run test  # Add testing framework
 - ⚠️ **No user management**: Single token authentication
 - ⚠️ **No database**: Not suitable for production scale
 
-### Future Enhancements
-- [ ] Add database integration (PostgreSQL/MongoDB)
-- [ ] Implement user registration and management
-- [ ] Add QR code generation
-- [ ] Implement analytics dashboard with charts
-- [ ] Add bulk import from CSV
-- [ ] Custom domain support
-- [ ] API versioning
-- [ ] Comprehensive testing suite
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature-name`
-3. Commit changes: `git commit -am 'Add feature'`
-4. Push to branch: `git push origin feature-name`
-5. Submit pull request
-
-## 📝 License
-
-This project is licensed under the ISC License.
 
 ## 👨‍💻 Author
 
