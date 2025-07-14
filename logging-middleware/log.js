@@ -1,6 +1,6 @@
 const axios = require('axios');
 require('dotenv').config();
-const AUTH_TOKEN = "process.env.AUTH_TOKEN"; // ← replace with your real token
+const AUTH_TOKEN = process.env.AUTH_TOKEN; // ✅ Fixed
 
 const log = async (stack, level, pkg, message) => {
   try {

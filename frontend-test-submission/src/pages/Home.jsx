@@ -1,12 +1,15 @@
 // src/pages/Home.jsx
 import React, { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [urls, setUrls] = useState([
     { url: "", validity: "", shortcode: "" },
   ]);
   const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (index, field, value) => {
     const newUrls = [...urls];
@@ -21,24 +24,56 @@ const Home = () => {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
+    setError(null);
+    setResults([]);
+    
+    const validUrls = urls.filter(u => u.url.trim() !== '');
+    
+    if (validUrls.length === 0) {
+      setError('Please enter at least one URL');
+      setLoading(false);
+      return;
+    }
+    
     const responses = [];
-    for (let data of urls) {
+    for (let data of validUrls) {
       try {
-        const res = await axios.post("http://localhost:5000/shorturls", {
-          url: data.url,
-          validity: data.validity ? parseInt(data.validity) : undefined,
-          shortcode: data.shortcode || undefined,
-        });
-        responses.push(res.data);
+        const res = await axios.post(
+          "http://localhost:5000/shorturls",
+          {
+            url: data.url.trim(),
+            validity: data.validity ? parseInt(data.validity) : undefined,
+            shortcode: data.shortcode.trim() || undefined,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_AUTH_TOKEN}`, // ✅ Fixed: Added Bearer prefix
+            },
+          }
+        );
+        responses.push({ success: true, data: res.data });
       } catch (err) {
-        responses.push({ error: err.response?.data || err.message });
+        responses.push({ 
+          success: false, 
+          error: err.response?.data?.error || err.message,
+          originalUrl: data.url 
+        });
       }
     }
     setResults(responses);
+    setLoading(false);
   };
+
 
   return (
     <div style={{ padding: "20px" }}>
+      <div style={{ marginBottom: "20px" }}>
+        <Link to="/stats" style={{ marginRight: "10px", textDecoration: "none", background: "#007bff", color: "white", padding: "8px 16px", borderRadius: "4px" }}>
+          📊 View Stats
+        </Link>
+      </div>
+      
       <h1>🔗 URL Shortener</h1>
 
       {urls.map((input, idx) => (
@@ -71,19 +106,33 @@ const Home = () => {
       </button>
       <br />
       <br />
-      <button onClick={handleSubmit}>🚀 Shorten URLs</button>
+      <button onClick={handleSubmit} disabled={urls.length >= 5 || loading}>
+        {loading ? '⏳ Processing...' : '🚀 Shorten URLs'}
+      </button>
+
+      {error && (
+        <div style={{ color: 'red', marginTop: '10px' }}>
+          ❌ {error}
+        </div>
+      )}
 
       <div style={{ marginTop: "20px" }}>
         <h2>Results:</h2>
         {results.map((res, idx) => (
-          <div key={idx}>
-            {res.shortLink ? (
+          <div key={idx} style={{ marginBottom: '10px', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }}>
+            {res.success ? (
               <>
-                ✅ <a href={res.shortLink}>{res.shortLink}</a>  
-                (Expires at: {res.expiry})
+                ✅ <strong>Success:</strong><br/>
+                <a href={res.data.shortLink} target="_blank" rel="noopener noreferrer">
+                  {res.data.shortLink}
+                </a><br/>
+                <small>Expires: {new Date(res.data.expiry).toLocaleString()}</small>
               </>
             ) : (
-              <div>❌ Error: {JSON.stringify(res.error)}</div>
+              <>
+                ❌ <strong>Error for {res.originalUrl}:</strong><br/>
+                <span style={{ color: 'red' }}>{res.error}</span>
+              </>
             )}
           </div>
         ))}

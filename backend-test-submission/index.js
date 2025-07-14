@@ -1,16 +1,37 @@
 // index.js
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
+const rateLimit = require('./middleware/rateLimiter');
 
 const app = express();
 const urlRoutes = require('./routes/urlRoutes');
 
-app.use(cors());
-app.use(bodyParser.json());
+// Security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://yourdomain.com'] 
+    : ['http://localhost:3000', 'http://localhost:5173'],
+  credentials: true
+}));
+
+// Body parsing middleware (use only one)
+app.use(express.json({ limit: '10mb' }));
+
+// Rate limiting
+app.use(rateLimit(50, 60000)); // 50 requests per minute
+
 app.use('/shorturls', urlRoutes);
 
-// Redirection logic
+// Redirection logic (must come after API routes)
 const storage = require('./utils/storage');
 const log = require('./middleware/logger');
 
@@ -33,7 +54,20 @@ app.get('/:shortcode', async (req, res) => {
   res.redirect(record.url);
 });
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// 404 handler - must be last
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on ${BASE_URL}`);
 });
