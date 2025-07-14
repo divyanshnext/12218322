@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Link } from "react-router-dom";
 
 const Home = () => {
   const [urls, setUrls] = useState([

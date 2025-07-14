@@ -44,7 +44,7 @@ npm install
 
 Create `.env` file:
 ```env
-AUTH_TOKEN=your_auth_token_here
+AUTH_TOKEN=your_static_auth_token_here
 NODE_ENV=development
 PORT=5000
 BASE_URL=http://localhost:5000
@@ -65,7 +65,7 @@ npm install
 
 Create `.env` file:
 ```env
-VITE_AUTH_TOKEN=your_auth_token_here
+VITE_AUTH_TOKEN=your_static_auth_token_here
 ```
 
 Start the development server:
@@ -199,7 +199,7 @@ Redirects to the original URL and tracks the click.
 
 #### Backend (`.env`)
 ```env
-AUTH_TOKEN=your_auth_token_here
+AUTH_TOKEN=your_static_auth_token_here
 NODE_ENV=development|production
 PORT=5000
 BASE_URL=http://localhost:5000
@@ -207,7 +207,7 @@ BASE_URL=http://localhost:5000
 
 #### Frontend (`.env`)
 ```env
-VITE_AUTH_TOKEN=your_auth_token_here
+VITE_AUTH_TOKEN=your_static_auth_token_here
 ```
 
 ### Rate Limiting
